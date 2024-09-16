@@ -1,0 +1,14 @@
+services:
+  cicd-db:
+    container_name: cicd-db
+    image: postgres:16.2
+    restart: unless-stopped
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    ports:
+      - "5436:5432"
+    environment:
+      POSTGRES_USER: ms-cicd
+      POSTGRES_PASSWORD: ms-cicd
+      POSTGRES_DB: ms-cicd
+
