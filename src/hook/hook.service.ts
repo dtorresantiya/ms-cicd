@@ -75,10 +75,9 @@ export class HookService extends PrismaClient implements OnModuleInit {
   }
 
   async deploy(payload: any) {
-    console.log(payload)
     const { ref , repository} = payload;
     const { full_name }  = repository;
-    
+    console.log(`Deploying ${full_name} on ${ref}`);
     if (!full_name || !ref) throw new HttpException({ message: 'Bad Request :| ' }, HttpStatus.BAD_REQUEST);
     
     let data: Hook[]  = [];
