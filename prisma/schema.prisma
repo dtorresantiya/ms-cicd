@@ -14,7 +14,7 @@ datasource db {
 }
 
 model Hook {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   name      String
   branch    String
   pipeline  String
