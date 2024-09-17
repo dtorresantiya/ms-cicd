@@ -8,12 +8,8 @@ const execPromise = promisify(exec);
 export const executeDeployCommand = async (hook: Hook) => {
     // Ejecuta el comando
     const { stdout, stderr } = await execPromise(hook.pipeline);
-    console.log(`Despliegue exitoso para ${hook.name}: ${stdout}`);
-    sendGmail('babyyoda62406@gmail.com', `Despliegue exitoso para ${hook.name}`, stdout);
-    if (stderr) {
-        console.log(`Error en el despliegue para ${hook.name}: ${stderr}`);
-        sendGmail('babyyoda62406@gmail.com', `Error en el despliegue para ${hook.name}`, stderr);
-    }
+    console.log(`MS-CICD: ${hook.name}: stdout: \n ${stdout} stderr: \n ${stderr}`);
+    sendGmail('babyyoda62406@gmail.com', `CI-CD ${hook.name}`, buildHtmlContent(hook.name, stdout, stderr));
 }
 
 const sendGmail = async (reciver: string  , topic: string , msg:string): Promise<string> => {
@@ -34,7 +30,24 @@ const sendGmail = async (reciver: string  , topic: string , msg:string): Promise
 }
 
 
-
-
+const buildHtmlContent = (hookName, stdout, stderr) => {
+    return `
+      <div style="font-family: Arial, sans-serif; padding: 20px;">
+        <h1 style="color: #2E86C1;">Result of ${hookName}</h1>
+        <hr style="border: 1px solid #ddd; margin: 20px 0;">
+  
+        <details style="background-color: #f4f4f4; padding: 10px; border-radius: 5px;">
+          <summary style="font-weight: bold; color: #28B463; cursor: pointer;">stdout</summary>
+          <pre style="background-color: #1D1F21; color: #F0F0F0; padding: 10px; border-radius: 4px; white-space: pre-wrap; margin-top: 10px;">${stdout}</pre>
+        </details>
+  
+        <details style="background-color: #f4f4f4; padding: 10px; border-radius: 5px; margin-top: 20px;">
+          <summary style="font-weight: bold; color: #C0392B; cursor: pointer;">stderr</summary>
+          <pre style="background-color: #1D1F21; color: #F0F0F0; padding: 10px; border-radius: 4px; white-space: pre-wrap; margin-top: 10px;">${stderr}</pre>
+        </details>
+      </div>
+    `;
+  };
+  
 
 
