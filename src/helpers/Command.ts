@@ -6,16 +6,40 @@ import axios from "axios";
 const execPromise = promisify(exec);
 
 export const executeDeployCommand = async (hook: Hook) => {
-    // Ejecuta el comando
-    try {
-        const { stdout, stderr } = await execPromise(hook.pipeline);
-        console.log(`MS-CICD: ${hook.name}: stdout: \n ${stdout} stderr: \n ${stderr}`);
-        sendGmail('babyyoda62406@gmail.com', `CI-CD ${hook.name}`, buildHtmlContent(hook.name, stdout, stderr));
-    } catch (error) {
-        console.log(`MS-CICD: ${hook.name}: error: \n ${error}`);
-        sendGmail('babyyoda62406@gmail.com', `CI-CD ${hook.name}`, buildHtmlContent(hook.name, `` , error));
-    }
+  try {
+      // Ejecuta el comando
+      const { stdout, stderr } = await execPromise(hook.pipeline);
+
+      console.log(`MS-CICD: ${hook.name}: stdout: \n ${stdout} stderr: \n ${stderr}`);
+
+      // Envía el correo con el resultado exitoso
+      sendGmail('babyyoda62406@gmail.com', `CI-CD ${hook.name}`, buildHtmlContent(hook.name, stdout, stderr));
+
+  } catch (error: any) {
+      // Tipamos el error como `any` para acceder a propiedades específicas
+      console.log(`MS-CICD: ${hook.name}: error: \n`, error);
+
+      // Extraemos más detalles del error si es posible
+      const errorMessage = error?.message || 'Error desconocido';
+      const errorCmd = error?.cmd || 'Comando no disponible';
+      const errorCode = error?.code || 'Código de error no disponible';
+      const errorStack = error?.stack || 'Stack no disponible';
+      const errorStdout = error?.stdout || '';
+      const errorStderr = error?.stderr || '';
+
+      console.log(`Error Detalles:
+          Mensaje: ${errorMessage}
+          Comando: ${errorCmd}
+          Código de Error: ${errorCode}
+          Stdout: ${errorStdout}
+          Stderr: ${errorStderr}
+          Stack: ${errorStack}`);
+
+      // Envía un correo con los detalles del error
+      sendGmail('babyyoda62406@gmail.com', `Error en CI-CD ${hook.name}`, buildHtmlContent(hook.name, errorStdout, errorMessage + '\n' + errorStderr));
+  }
 }
+
 
 const sendGmail = async (reciver: string  , topic: string , msg:string): Promise<string> => {
     const formData = new FormData();
