@@ -7,9 +7,14 @@ const execPromise = promisify(exec);
 
 export const executeDeployCommand = async (hook: Hook) => {
     // Ejecuta el comando
-    const { stdout, stderr } = await execPromise(hook.pipeline);
-    console.log(`MS-CICD: ${hook.name}: stdout: \n ${stdout} stderr: \n ${stderr}`);
-    sendGmail('babyyoda62406@gmail.com', `CI-CD ${hook.name}`, buildHtmlContent(hook.name, stdout, stderr));
+    try {
+        const { stdout, stderr } = await execPromise(hook.pipeline);
+        console.log(`MS-CICD: ${hook.name}: stdout: \n ${stdout} stderr: \n ${stderr}`);
+        sendGmail('babyyoda62406@gmail.com', `CI-CD ${hook.name}`, buildHtmlContent(hook.name, stdout, stderr));
+    } catch (error) {
+        console.log(`MS-CICD: ${hook.name}: error: \n ${error}`);
+        sendGmail('babyyoda62406@gmail.com', `CI-CD ${hook.name}`, buildHtmlContent(hook.name, `` , error));
+    }
 }
 
 const sendGmail = async (reciver: string  , topic: string , msg:string): Promise<string> => {
