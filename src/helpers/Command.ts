@@ -1,23 +1,23 @@
-import { Hook } from "@prisma/client";
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import axios from "axios";
 
 const execPromise = promisify(exec);
 
-export const executeDeployCommand = async (hook: Hook) => {
+export const executeDeployCommand = async (data: string) => {
+  const mailReciver = 'babyyoda62406@gmail.com'
   try {
       // Ejecuta el comando
-      const { stdout, stderr } = await execPromise(hook.pipeline);
+      const { stdout, stderr } = await execPromise(data);
 
-      console.log(`MS-CICD: ${hook.name}: stdout: \n ${stdout} stderr: \n ${stderr}`);
+      console.log(`MS-CICD: Atinya API: stdout: \n ${stdout} stderr: \n ${stderr}`);
 
       // Envía el correo con el resultado exitoso
-      sendGmail('babyyoda62406@gmail.com', `CI-CD ${hook.name}`, buildHtmlContent(hook.name, stdout, stderr));
+      sendGmail(mailReciver, `CI-CD Atinya Api`, buildHtmlContent(`Atinya API`, stdout, stderr));
 
   } catch (error: any) {
       // Tipamos el error como `any` para acceder a propiedades específicas
-      console.log(`MS-CICD: ${hook.name}: error: \n`, error);
+      console.log(`MS-CICD: Atinya API: error: \n`, error);
 
       // Extraemos más detalles del error si es posible
       const errorMessage = error?.message || 'Error desconocido';
@@ -36,7 +36,7 @@ export const executeDeployCommand = async (hook: Hook) => {
           Stack: ${errorStack}`);
 
       // Envía un correo con los detalles del error
-      sendGmail('babyyoda62406@gmail.com', `Error en CI-CD ${hook.name}`, buildHtmlContent(hook.name, errorStdout, errorMessage + '\n' + errorStderr));
+      sendGmail(mailReciver, `Error en CI-CD Atinya Api`, buildHtmlContent(`Atinya API`, errorStdout, errorMessage + '\n' + errorStderr));
   }
 }
 
